@@ -4,6 +4,7 @@ from time import sleep
 from dqn_agent import Agent
 from collections import deque
 import torch
+import matplotlib.pyplot as plt
 
 # Get the Unity environment
 env = UnityEnvironment(file_name="Banana_Windows_x86_64/Banana.exe")
@@ -78,12 +79,19 @@ def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.9)
         if score > max_score:
             max_score = score
             torch.save(agent.qnetwork_local.state_dict(), 'best.pth')
-        if max_score > 50:
+        if np.mean(scores_window) > 20:
             break
     return scores
 
-scores = dqn()
+scores = dqn(2000, 1000, 1, .01, .5)
 
+# plot the scores
+fig = plt.figure()
+ax = fig.add_subplot(111)
+plt.plot(np.arange(len(scores)), scores)
+plt.ylabel('Score')
+plt.xlabel('Episode #')
+plt.show()
 
 
 # ### 3. Take Random Actions in the Environment
