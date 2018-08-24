@@ -1,6 +1,5 @@
 from unityagents import UnityEnvironment
 import numpy as np
-from time import sleep
 from dqn_agent import Agent
 from collections import deque
 import torch
@@ -9,37 +8,31 @@ import matplotlib.pyplot as plt
 # Get the Unity environment
 env = UnityEnvironment(file_name="Banana_Windows_x86_64/Banana.exe")
 
-
-# Environments contain **_brains_** which are responsible for deciding the actions of their associated agents.
-# Here we check for the first brain available, and set it as the default brain we will be controlling from Python.
-
-# get the default brain
+# Set the brain we control from Python to the first one available
 brain_name = env.brain_names[0]
 brain = env.brains[brain_name]
 
-
-# Examine the State and Action Spaces
-
-# reset the environment
+# Reset the environment
 env_info = env.reset(train_mode=True)[brain_name]
 
-# number of agents in the environment
+# Number of agents in the environment
 print('Number of agents:', len(env_info.agents))
 
-# number of actions
+# Number of actions
 action_size = brain.vector_action_space_size
 print('Number of actions:', action_size)
 
-# examine the state space 
+# Examine the state space 
 state = env_info.vector_observations[0]
 print('States look like:', state)
 state_size = len(state)
 print('States have length:', state_size)
 
+# Set up agent with appropriate sizes for the state and action spaces
 agent = Agent(state_size=state_size, action_size=action_size, seed=0)
 
 
-def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.9):
+def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.995):
     """Deep Q-Learning.
     
     Params
@@ -50,61 +43,56 @@ def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.9)
         eps_end (float): minimum value of epsilon
         eps_decay (float): multiplicative factor (per episode) for decreasing epsilon
     """
-    max_score = 0;
-    scores = []                        # list containing scores from each episode
-    scores_window = deque(maxlen=100)  # last 100 scores
-    eps = eps_start                    # initialize epsilon
+    max_score = 13;                    # Track max score in order to save best performing network
+    scores = []                        # List containing scores from each episode
+    scores_window = deque(maxlen=100)  # Last 100 scores
+    eps = eps_start                    # Initialize epsilon
     for i_episode in range(1, n_episodes+1):
         # reset the environment
         env_info = env.reset(train_mode=True)[brain_name]
         state = env_info.vector_observations[0]
         score = 0
         for t in range(max_t):
-            action = int(agent.act(state, eps))
-            env_info = env.step(action)[brain_name]        # send the action to the environment
-            next_state = env_info.vector_observations[0]   # get the next state
-            reward = env_info.rewards[0]                   # get the reward
-            done = env_info.local_done[0]                  # see if episode has finished
-            agent.step(state, action, reward, next_state, done)
-            state = next_state
-            score += reward
+            action = int(agent.act(state, eps))            # Get the next action
+            env_info = env.step(action)[brain_name]        # Send the action to the environment
+            next_state = env_info.vector_observations[0]   # Get the next state
+            reward = env_info.rewards[0]                   # Get the reward
+            done = env_info.local_done[0]                  # See if the episode has finished
+            agent.step(state, action, reward, next_state, done) # Send training information to DQN algorithm
+            state = next_state          # Transition to next state
+            score += reward             # Track the score
             if done:
                 break 
-        scores_window.append(score)       # save most recent score
-        scores.append(score)              # save most recent score
+        scores_window.append(score)       # save most recent score to moving window
+        scores.append(score)              # save most recent score to complete list of scores
         eps = max(eps_end, eps_decay*eps) # decrease epsilon
         print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)), end="")
         if i_episode % 100 == 0:
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
-        if score > max_score:
+        if score >= max_score:
             max_score = score
             torch.save(agent.qnetwork_local.state_dict(), 'best.pth')
         if np.mean(scores_window) > 20:
             break
     return scores
 
-scores = dqn(2000, 1000, 1, .01, .5)
+scores = dqn(1000, 1000, 1, .01, .99)
 
-# plot the scores
+# Plot and save the scores
 fig = plt.figure()
 ax = fig.add_subplot(111)
 plt.plot(np.arange(len(scores)), scores)
 plt.ylabel('Score')
 plt.xlabel('Episode #')
+fig.savefig("TrainingResults.png")
 plt.show()
 
-
-# ### 3. Take Random Actions in the Environment
-# 
-# In the next code cell, you will learn how to use the Python API to control the agent and receive feedback from the environment.
-# 
-# Note that **in this coding environment, you will not be able to watch the agent while it is training**, and you should set `train_mode=True` to restart the environment.
-
-env_info = env.reset(train_mode=True)[brain_name] # reset the environment
+# Load and run best entity
+env_info = env.reset(train_mode=False)[brain_name] # reset the environment
 state = env_info.vector_observations[0]            # get the current state
 score = 0                                          # initialize the score
+agent.qnetwork_local.load_state_dict(torch.load('best.pth'))
 while True:
-    #action = np.random.randint(action_size)        # select an action
     action = int(agent.act(state))
     env_info = env.step(action)[brain_name]        # send the action to the environment
     next_state = env_info.vector_observations[0]   # get the next state
@@ -112,27 +100,10 @@ while True:
     done = env_info.local_done[0]                  # see if episode has finished
     score += reward                                # update the score
     state = next_state                             # roll over the state to next time step
-    sleep(0.05)
     if done:                                       # exit loop if episode finished
         break
     
 print("Score: {}".format(score))
 
-
-
-
 # Close the environment.
 env.close()
-
-
-# ### 4. It's Your Turn!
-# 
-# Now it's your turn to train your own agent to solve the environment!  A few **important notes**:
-# - When training the environment, set `train_mode=True`, so that the line for resetting the environment looks like the following:
-# ```python
-# env_info = env.reset(train_mode=True)[brain_name]
-# ```
-# - To structure your work, you're welcome to work directly in this Jupyter notebook, or you might like to start over with a new file!
-# You can see the list of files in the workspace by clicking on **_Jupyter_** in the top left corner of the notebook.
-# - In this coding environment, you will not be able to watch the agent while it is training.  
-# However, **_after training the agent_**, you can download the saved model weights to watch the agent on your own machine! 
