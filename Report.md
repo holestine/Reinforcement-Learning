@@ -3,7 +3,7 @@ The underlying neural network has a fully connected architecture with 37 inputs,
 
 # Reward History
 The total rewards for each episode are shown in the diagram below where the maximum score was 27 and the last 100 had an average of approximatelly 16. The average score exceeded 13 after about 400 time steps but was allowed to run until all episodes completed or an average score of 20 was obtained (this never happened).
-![Training Profile](images\\training.png)
+![Training Profile](images/training.png)
 
 
 # Improvements
