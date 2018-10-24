@@ -9,14 +9,14 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-BUFFER_SIZE = int(1e6)  # replay buffer size
-BATCH_SIZE = 64         # minibatch size
+BUFFER_SIZE = int(1e3)  # replay buffer size
+BATCH_SIZE = 20         # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor 
-LR_CRITIC = 1e-3        # learning rate of the critic
-WEIGHT_DECAY = 0.01     # L2 weight decay
-
+LR_CRITIC = 3e-4        # learning rate of the critic
+WEIGHT_DECAY = 0.0001   # L2 weight decay
+UPDATE_EVERY = 20
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -32,6 +32,8 @@ class Agent():
             action_size (int): dimension of each action
             random_seed (int): random seed
         """
+        self.t = 0
+
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(random_seed)
@@ -56,13 +58,10 @@ class Agent():
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         self.memory.add(state, action, reward, next_state, done)
-
+        self.t += 1
         # Learn, if enough samples are available in memory
-        #if len(self.memory) > BATCH_SIZE:
-        if len(self.memory) % BATCH_SIZE == 0:
-            for x in range(10):
-                experiences = self.memory.sample()
-                self.learn(experiences, GAMMA)
+        if self.t % UPDATE_EVERY == 0:
+            self.learn(self.memory.sample(), GAMMA)
 
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""

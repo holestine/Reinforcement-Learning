@@ -34,11 +34,11 @@ print('States have length:', state_size)
 # Set up agent with appropriate sizes for the state and action spaces
 agent = Agent(state_size=state_size, action_size=action_size, random_seed=0)
 
-def ddpg(n_episodes=50000, max_t=1000, print_every=100):
-    env_info = env.reset(train_mode=True)[brain_name]
+def ddpg(n_episodes=300, max_t=5000, print_every=100):
     scores_deque = deque(maxlen=print_every)
-    scores = [0]
+    scores = []
     for i_episode in range(1, n_episodes+1):
+        env_info = env.reset(train_mode=True)[brain_name]
         state = env_info.vector_observations
         agent.reset()
         score = 0
@@ -47,18 +47,24 @@ def ddpg(n_episodes=50000, max_t=1000, print_every=100):
             env_info = env.step(action)[brain_name]           # send the action to tne environment
             next_state = env_info.vector_observations         # get next state (for each agent)
             reward = env_info.rewards                         # get reward (for each agent)
-            score += reward[0]                                # update the score (for each agent)
             agent.step(state, action, reward, next_state, env_info.local_done)
+            score += reward[0]                                # update the score (for each agent)
             state = next_state                                # roll over to next time step
-            if env_info.local_done:                           # see if episode finished
-                break 
+            if env_info.local_done[0]:                        # see if episode finished
+                break
+        if len(scores_deque) > 0 and score > np.max(scores_deque):
+            torch.save(agent.actor_target.state_dict(), 'checkpoint_actor_target.pth')
+            torch.save(agent.critic_target.state_dict(), 'checkpoint_critic_target.pth') 
+            torch.save(agent.actor_local.state_dict(), 'checkpoint_actor_local.pth')
+            torch.save(agent.critic_local.state_dict(), 'checkpoint_critic_local.pth') 
         scores_deque.append(score)
         scores.append(score)
         print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)), end="")
         if i_episode % print_every == 0:
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)))
-    torch.save(agent.actor_target.state_dict(), 'checkpoint_actor.pth')
-    torch.save(agent.critic_target.state_dict(), 'checkpoint_critic.pth')     
+            torch.save(agent.actor_local.state_dict(), 'actor.pth')
+            torch.save(agent.critic_local.state_dict(), 'critic.pth')
+        
     return scores
 
 scores = ddpg()
