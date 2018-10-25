@@ -36,9 +36,9 @@ def run(actor, critic):
     print("Score: {}".format(score))
 
 
-run('checkpoint_actor_local.pth', 'checkpoint_critic_local.pth')
+#run('checkpoint_actor_local.pth', 'checkpoint_critic_local.pth')
 run('checkpoint_actor_target.pth', 'checkpoint_critic_target.pth')
-run('actor.pth', 'critic.pth')
+#run('actor.pth', 'critic.pth')
 
 # Close the environment
 env.close()
