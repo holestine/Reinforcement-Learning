@@ -52,7 +52,7 @@ def ddpg(n_episodes=300, max_t=5000, print_every=100):
             state = next_state                                # roll over to next time step
             if env_info.local_done[0]:                        # see if episode finished
                 break
-        if len(scores_deque) > 0 and score > np.max(scores_deque):
+        if len(scores) > 0 and score > np.max(scores):
             torch.save(agent.actor_target.state_dict(), 'checkpoint_actor_target.pth')
             torch.save(agent.critic_target.state_dict(), 'checkpoint_critic_target.pth') 
             torch.save(agent.actor_local.state_dict(), 'checkpoint_actor_local.pth')
