@@ -79,7 +79,7 @@ class Agent():
             if self.t % 2 == 0:
                 action += self.noise.sample()
             else:
-                action += np.random.normal(0, .1, 4)
+                action += np.random.normal(0, 1, 4)
         return np.clip(action, -1, 1)
 
     def reset(self):
