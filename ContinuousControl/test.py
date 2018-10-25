@@ -14,12 +14,12 @@ brain = env.brains[brain_name]
 
 # Reset the environment
 env_info = env.reset(train_mode=False)[brain_name]
-score = 0                                          # Initialize the score
 state = env_info.vector_observations               # Initialize the state
 agent = Agent(state_size=len(state[0]), action_size=brain.vector_action_space_size, random_seed=1)
 
-   
 def run(actor, critic):
+    global agent, env, state
+    score = 0                                          # Initialize the score
     agent.actor_local.load_state_dict(torch.load(actor))  # load checkpoints
     agent.critic_local.load_state_dict(torch.load(critic))
     while True:
@@ -38,7 +38,7 @@ def run(actor, critic):
 
 run('checkpoint_actor_local.pth', 'checkpoint_critic_local.pth')
 run('checkpoint_actor_target.pth', 'checkpoint_critic_target.pth')
-run('actor.pth' 'critic.pth')
+run('actor.pth', 'critic.pth')
 
 # Close the environment
 env.close()
