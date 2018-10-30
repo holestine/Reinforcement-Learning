@@ -33,8 +33,6 @@ class Agent():
             action_size (int): dimension of each action
             random_seed (int): random seed
         """
-        # Create variable to keep track of iterations
-        self.t = 0 
 
         self.state_size = state_size
         self.action_size = action_size
@@ -58,9 +56,6 @@ class Agent():
     
     def step(self, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
-        
-        # Increase iterations
-        self.t += 1
 
         # Save experience / reward
         self.memory.add(state, action, reward, next_state, done)
