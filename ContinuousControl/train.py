@@ -52,22 +52,17 @@ def ddpg(n_episodes=300, max_t=5000, print_every=100):
             state = next_state                                # roll over to next time step
             if env_info.local_done[0]:                        # see if episode finished
                 break
-        if len(scores) > 0 and score > np.max(scores):
-            torch.save(agent.actor_target.state_dict(), 'checkpoint_actor_target.pth')
-            torch.save(agent.critic_target.state_dict(), 'checkpoint_critic_target.pth') 
-            torch.save(agent.actor_local.state_dict(), 'checkpoint_actor_local.pth')
-            torch.save(agent.critic_local.state_dict(), 'checkpoint_critic_local.pth') 
         scores_deque.append(score)
         scores.append(score)
-        print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)), end="")
+        print('\rEpisode {}\tAverage Score: {:.2f}\tMax Score: {:.2f}\tLast Score: {:.2f}'.format(i_episode, np.mean(scores_deque), np.max(scores), scores[-1]), end="")
         if i_episode % print_every == 0:
-            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_deque)))
-            torch.save(agent.actor_local.state_dict(), 'actor.pth')
-            torch.save(agent.critic_local.state_dict(), 'critic.pth')
-        
+            print('\rEpisode {}\tAverage Score: {:.2f}\tMax Score: {:.2f}\tLast Score: {:.2f}'.format(i_episode, np.mean(scores_deque), np.max(scores), scores[-1]))
+
     return scores
 
 scores = ddpg()
+torch.save(agent.actor_target.state_dict(), 'actor.pth')
+torch.save(agent.critic_target.state_dict(), 'critic.pth')
 
 fig = plt.figure()
 ax = fig.add_subplot(111)

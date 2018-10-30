@@ -13,3 +13,5 @@ This is representative of what I'm currently seeing.
 
 # Improvements
 I'll update this when I get better results.
+Shrink ball
+Jitter
