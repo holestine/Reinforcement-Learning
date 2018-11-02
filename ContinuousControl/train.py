@@ -54,9 +54,9 @@ def ddpg(n_episodes=300, max_t=5000, print_every=100):
                 break
         scores_deque.append(score)
         scores.append(score)
-        print('\rEpisode {}\tAverage Score: {:.2f}\tMax Score: {:.2f}\tLast Score: {:.2f}'.format(i_episode, np.mean(scores_deque), np.max(scores), scores[-1]), end="")
+        print('\rEpisode {} \tAverage Score: {:.2f} \tMax Score: {:.2f} \tLast Score: {:.2f}'.format(i_episode, np.mean(scores_deque), np.max(scores), scores[-1]), end="")
         if i_episode % print_every == 0:
-            print('\rEpisode {}\tAverage Score: {:.2f}\tMax Score: {:.2f}\tLast Score: {:.2f}'.format(i_episode, np.mean(scores_deque), np.max(scores), scores[-1]))
+            print('\rEpisode {} \tAverage Score: {:.2f} \tMax Score: {:.2f} \tLast Score: {:.2f}'.format(i_episode, np.mean(scores_deque), np.max(scores), scores[-1]))
 
     return scores
 
