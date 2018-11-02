@@ -36,6 +36,8 @@ def run(actor, critic):
     agent.critic_local.load_state_dict(torch.load(critic))
 
     for i in range(10):
+        env_info = env.reset(train_mode=False)[brain_name]
+        state = env_info.vector_observations
         for j in range(100):
             action = agent.act(state, add_noise=False)     # get the action from the agent
             env_info = env.step(action)[brain_name]        # send the action to the environment
