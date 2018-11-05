@@ -5,6 +5,7 @@ import torch
 import numpy as np
 
 BUFFER_SIZE = int(1e6)  # replay buffer size
+BATCH_SIZE = 512       # minibatch size
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 

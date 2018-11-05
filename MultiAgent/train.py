@@ -51,6 +51,7 @@ def ddpg(n_episodes=300, max_t=5000, print_every=100):
             env_info = env.step(action)[brain_name]           # send the action to tne environment
             next_state = env_info.vector_observations         # get next state (for each agent)
             reward = env_info.rewards                         # get reward (for each agent)
+            #if (t % 2 == 0):
             memory.add(state, action, reward, next_state, env_info.local_done)
             agent.step(memory)
             score += reward[0]                                # update the score (for each agent)
