@@ -18,6 +18,7 @@ from buffer import ReplayBuffer, BUFFER_SIZE, BATCH_SIZE
 #WEIGHT_DECAY = 0.0001   # L2 weight decay
 #UPDATE_EVERY = 20
 #MAJOR_UPDATE_EVERY = 20 * UPDATE_EVERY
+#DO_MAJOR_UPDATE = True
 
 #MulitAgent
 GAMMA = 0.95            # discount factor
@@ -27,6 +28,7 @@ LR_CRITIC = 1e-2        # learning rate of the critic
 WEIGHT_DECAY = 0.0001   # L2 weight decay
 UPDATE_EVERY = 100
 MAJOR_UPDATE_EVERY = 20 * UPDATE_EVERY
+DO_MAJOR_UPDATE = False
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -61,14 +63,11 @@ class Agent():
         self.noise = OUNoise(action_size, random_seed)
     
     def step(self, memory):
-        """Save experience in replay memory, and use random sample from buffer to learn."""
-
-        # Save experience / reward
-        #self.memory.add(state, action, reward, next_state, done, memory)
+        """Use random sample from buffer to learn at regular intervals."""
 
         # Learn, if enough samples are available in memory
         if len(memory) > BATCH_SIZE:
-            if len(memory) % MAJOR_UPDATE_EVERY == 0:
+            if len(memory) % MAJOR_UPDATE_EVERY == 0 and DO_MAJOR_UPDATE:
                 for i in range(20):
                     self.learn(memory.sample(), GAMMA)
             elif len(memory) % UPDATE_EVERY == 0:
@@ -82,7 +81,8 @@ class Agent():
             action = self.actor_local(state).cpu().data.numpy()
         self.actor_local.train()
         if add_noise:
-            action += np.random.normal(0, .3, self.action_size)
+            #action += self.noise.sample()
+            action += np.random.normal(0, 1, self.action_size)
         return np.clip(action, -1, 1)
 
     def reset(self):

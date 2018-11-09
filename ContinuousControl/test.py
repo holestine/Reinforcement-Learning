@@ -21,8 +21,19 @@ def run(actor, critic):
     global agent, env, state
     score = 0                                          # Initialize the score
 
-    for j in range(100):
+    for j in range(500):
         action = agent.act(state, add_noise=False)     # get the action from the agent
+        env_info = env.step(action)[brain_name]        # send the action to the environment
+        next_state = env_info.vector_observations      # get the next state
+        reward = env_info.rewards[0]                   # get the reward
+        done = env_info.local_done[0]                  # see if episode has finished
+        score += reward                                # update the score
+        state = next_state                             # roll over the state to next time step
+        if done:                                       # Exit loop if episode finished
+            break
+    
+    for j in range(500):
+        action = agent.act(state, add_noise=True)     # get the action from the agent
         env_info = env.step(action)[brain_name]        # send the action to the environment
         next_state = env_info.vector_observations      # get the next state
         reward = env_info.rewards[0]                   # get the reward
