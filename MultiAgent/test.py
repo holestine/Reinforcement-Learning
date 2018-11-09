@@ -41,7 +41,7 @@ def start_demo(actors, critics):
     # Run with random agents
     for i in range(num_agents):
         agent.append(Agent(state_size=state_size, action_size=action_size, random_seed=i))
-    run()
+    #run()
 
     # Run with saved checkpoints
     for i in range(num_agents):
