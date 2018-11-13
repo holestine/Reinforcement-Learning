@@ -16,7 +16,7 @@ action_size = env.brains[brain_name].vector_action_space_size
 
 agent = []
 
-def run(time=200):
+def run(time=500):
     global env
     env_info = env.reset(train_mode=False)[brain_name]
     state = env_info.vector_observations

@@ -34,9 +34,13 @@ print('States look like:', state[0])
 # Set up agent with appropriate sizes for the state and action spaces
 agent = []
 memory = []
+actors, critics = ['actor0.pth', 'actor1.pth'], ['critic0.pth', 'critic1.pth']
 for i in range(num_agents):
     agent.append(Agent(state_size=state_size, action_size=action_size, random_seed=i))
     memory.append(ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, i))
+    agent[i].actor_local.load_state_dict(torch.load(actors[i]))  
+    agent[i].critic_local.load_state_dict(torch.load(critics[i]))
+
 
 def ddpg(n_episodes=10000, max_t=500, print_every=100):
     scores_deque = deque(maxlen=print_every)
@@ -52,7 +56,7 @@ def ddpg(n_episodes=10000, max_t=500, print_every=100):
         for t in range(max_t):
             action = []
             for i in range(num_agents):
-                action.append(agent[i].act(np.reshape(state[i], ((1,state_size))), add_noise=True))   # Get noisy action
+                action.append(agent[i].act(np.reshape(state[i], ((1,state_size))), add_noise=False))   # Get noisy action
             
             env_info = env.step(np.reshape(action, (action_size*num_agents, 1)))[brain_name]          # Perform a step in the environment
             next_state = env_info.vector_observations                                                 # Get the new state (for each agent)
@@ -72,11 +76,14 @@ def ddpg(n_episodes=10000, max_t=500, print_every=100):
         scores.append(np.max(score))
         
         # Save weights when score improves
-        if scores[len(scores)-1] == np.max(scores):
-            torch.save(agent[0].actor_target.state_dict(), 'actor0.pth')
-            torch.save(agent[0].critic_target.state_dict(), 'critic0.pth')
-            torch.save(agent[1].actor_target.state_dict(), 'actor1.pth')
-            torch.save(agent[1].critic_target.state_dict(), 'critic1.pth')
+        try:
+            if scores[len(scores)-1] == np.max(scores):
+                torch.save(agent[0].actor_target.state_dict(), 'actor0.pth')
+                torch.save(agent[0].critic_target.state_dict(), 'critic0.pth')
+                torch.save(agent[1].actor_target.state_dict(), 'actor1.pth')
+                torch.save(agent[1].critic_target.state_dict(), 'critic1.pth')
+        except:
+            print("Failed to save weights on episode {}", i_episode)
 
         # Send status to display
         print('\rEpisode {} \tAverage Score: {:.2f} \tMax Score: {:.2f} \tLast Score: {:.2f}'.format(i_episode, np.mean(scores_deque), np.max(scores), scores[-1]), end="")
@@ -88,7 +95,7 @@ def ddpg(n_episodes=10000, max_t=500, print_every=100):
 scores = ddpg()
 
 # Plot results
-fig = plt.figure()
+ fig = plt.figure()
 ax = fig.add_subplot(111)
 plt.plot(np.arange(1, len(scores)+1), scores)
 plt.ylabel('Score')
