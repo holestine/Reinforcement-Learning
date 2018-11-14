@@ -13,7 +13,8 @@ This yields a single score for each episode.
 The environment is considered solved, when the average (over 100 episodes) of those scores is at least +0.5.
 
 # Dependencies
-All files needed to run train.py and test.py are in the repository however you will need to install the Python libraries: pytorch, unityagents, numpy, collections, matplotlib, copy and random (e.g., pip install pytorch).
+Install Unity using the instructions at https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Installation.md 
+Install the Python libraries: pytorch, unityagents, numpy, collections, matplotlib, copy and random (e.g., pip install pytorch).
 
 # Train the model
 In order to train the agent execute the file train.py.
