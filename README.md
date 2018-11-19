@@ -9,5 +9,5 @@ Install the Python libraries: pytorch, unityagents, numpy, matplotlib, copy and 
 For each project train the agent(s) by running the file train.py.
 
 # Run the model
-To view the behavior of the trained agent(s) run the file test.py which first executes with randomly initialized networks and then loads the saved checkpoints to show the results of the training.
+To view the behavior of the trained agent(s) run the file test.py which first executes with randomly initialized networks and then loads the saved PyTorch checkpoints to show the results of the training.
 

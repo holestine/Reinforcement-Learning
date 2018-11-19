@@ -8,23 +8,21 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-from buffer import ReplayBuffer, BUFFER_SIZE, BATCH_SIZE
-
 #Hyperparameters
-GAMMA = 0.99            # discount factor
-TAU = 1e-3              # for soft update of target parameters
-LR_ACTOR = 1e-3         # learning rate of the actor 
-LR_CRITIC = 1e-3        # learning rate of the critic
+GAMMA = 0.99            # Discount factor
+TAU = 1e-3              # Amount for soft update of target parameters
+LR_ACTOR = 1e-3         # Actor learning rate
+LR_CRITIC = 1e-3        # Critic learning rate
 WEIGHT_DECAY = 0.0001   # L2 weight decay
-UPDATE_EVERY = 20
-MAJOR_UPDATE_EVERY = 10 * UPDATE_EVERY
+UPDATE_EVERY = 20                          # Minor update frequency
+MAJOR_UPDATE_EVERY = 10 * UPDATE_EVERY     # Major update frequency
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent():
     """Interacts with and learns from the environment."""
     
-    def __init__(self, state_size, action_size, random_seed):
+    def __init__(self, state_size, action_size, batch_size, random_seed):
         """Initialize an Agent object.
         
         Params
@@ -36,6 +34,7 @@ class Agent():
 
         self.state_size = state_size
         self.action_size = action_size
+        self.batch_size = batch_size
         self.seed = random.seed(random_seed)
 
         # Actor Network (w/ Target Network)
@@ -59,7 +58,7 @@ class Agent():
         """Use random sample from buffer to learn at regular intervals."""
 
         # Learn, if enough samples are available in memory
-        if len(memory) > BATCH_SIZE:
+        if len(memory) > self.batch_size:
             if len(memory) % MAJOR_UPDATE_EVERY == 0 and self.major_update:
                 for i in range(20):
                     self.learn(memory.sample(), GAMMA)
@@ -76,9 +75,6 @@ class Agent():
         if add_noise:
             action += np.random.normal(0, 1, self.action_size)
         return np.clip(action, -1, 1)
-
-    def reset(self):
-        self.noise.reset()
 
     def learn(self, experiences, gamma):
         """Update policy and value parameters using given batch of experience tuples.
@@ -131,25 +127,3 @@ class Agent():
         """
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
-
-class OUNoise:
-    """Ornstein-Uhlenbeck process."""
-
-    def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.2):
-        """Initialize parameters and noise process."""
-        self.mu = mu * np.ones(size)
-        self.theta = theta
-        self.sigma = sigma
-        self.seed = random.seed(seed)
-        self.reset()
-
-    def reset(self):
-        """Reset the internal state (= noise) to mean (mu)."""
-        self.state = copy.copy(self.mu)
-
-    def sample(self):
-        """Update internal state and return it as a noise sample."""
-        x = self.state
-        dx = self.theta * (self.mu - x) + self.sigma * np.array([random.random() for i in range(len(x))])
-        self.state = x + dx
-        return self.state

@@ -34,13 +34,10 @@ def run(time=250):
         # Update state
         state = env_info.vector_observations
 
-        #if any(env_info.local_done):                      # see if episode finished
-        #    break
-
 def start_demo(actors, critics):
     # Run with random agents
     for i in range(num_agents):
-        agent.append(Agent(state_size=state_size, action_size=action_size, random_seed=i))
+        agent.append(Agent(state_size=state_size, action_size=action_size, batch_size=0, random_seed=i))
     run()
 
     # Run with saved checkpoints
