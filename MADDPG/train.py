@@ -4,7 +4,9 @@ import torch
 import matplotlib.pyplot as plt
 from ddpg_agent import Agent
 
-from buffer import ReplayBuffer, BUFFER_SIZE, BATCH_SIZE
+from buffer import ReplayBuffer
+BUFFER_SIZE = int(1e6)  # Replay buffer size
+BATCH_SIZE = 1024       # Minibatch size
 
 # Get the Unity environment for vector observations
 env = UnityEnvironment(file_name="Tennis_Windows_x86_64/Tennis.exe")
@@ -32,16 +34,16 @@ print('\nStates look like:', state[0], '\n')
 
 actors, critics = ['actor0.pth', 'actor1.pth'], ['critic0.pth', 'critic1.pth']
 
-def ddpg(n_episodes=50000, max_t=500, print_every=100):
+def maddpg(n_episodes=50000, max_t=500, print_every=100):
     training_phase = 1
     scores = []
     add_noise=True
+
     for i_episode in range(1, n_episodes+1):
         env_info = env.reset(train_mode=True)[brain_name]
         state = env_info.vector_observations
         score = []
-        for i in range(num_agents):
-            agent[i].reset()
+        for i in range(num_agents):   # Initialize scores
             score.append(0)
 
         for t in range(max_t):
@@ -74,13 +76,8 @@ def ddpg(n_episodes=50000, max_t=500, print_every=100):
                 torch.save(agent[1].critic_target.state_dict(), critics[1])
             if training_phase == 1 and np.max(scores) > 1:
                 training_phase = 2
-                #agent = []
-                #memory = []
                 for i in range(num_agents):
-                    #agent.append(Agent(state_size=state_size, action_size=action_size, random_seed=i)) #change learning rate here
                     memory[i] = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, i)
-                    #agent[i].actor_local.load_state_dict(torch.load(actors[i]))  
-                    #agent[i].critic_local.load_state_dict(torch.load(critics[i]))
                     agent[i].enable_major_update(False)
                     add_noise=False
         except:
@@ -101,10 +98,10 @@ agent = []
 memory = []
 
 for i in range(num_agents):
-    agent.append(Agent(state_size=state_size, action_size=action_size, random_seed=i))
+    agent.append(Agent(state_size=state_size, action_size=action_size, batch_size=BATCH_SIZE, random_seed=i))
     memory.append(ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, i))
 
-scores = ddpg()
+scores = maddpg()
 
 # Plot results
 fig = plt.figure()
