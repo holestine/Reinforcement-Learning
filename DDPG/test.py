@@ -33,7 +33,7 @@ def run(actor, critic):
             break
     
     for j in range(500):
-        action = agent.act(state, add_noise=True)     # get the action from the agent
+        action = agent.act(state, add_noise=True)      # get the action from the agent
         env_info = env.step(action)[brain_name]        # send the action to the environment
         next_state = env_info.vector_observations      # get the next state
         reward = env_info.rewards[0]                   # get the reward
