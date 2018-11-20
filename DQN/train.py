@@ -71,8 +71,8 @@ def dqn(n_episodes=2000, max_t=1000, eps_start=1.0, eps_end=0.01, eps_decay=0.99
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
         if score >= max_score:
             max_score = score
-            torch.save(agent.qnetwork_local.state_dict(), 'best.pth')
-        if np.mean(scores_window) > 20:
+            torch.save(agent.qnetwork_local.state_dict(), 'agent.pth')
+        if np.mean(scores_window) > 13:
             break
     return scores
 
@@ -84,26 +84,8 @@ ax = fig.add_subplot(111)
 plt.plot(np.arange(len(scores)), scores)
 plt.ylabel('Score')
 plt.xlabel('Episode #')
-fig.savefig("TrainingResults.png")
+fig.savefig("images/training.png")
 plt.show()
-
-# Load and run best entity
-env_info = env.reset(train_mode=False)[brain_name] # reset the environment
-state = env_info.vector_observations[0]            # get the current state
-score = 0                                          # initialize the score
-agent.qnetwork_local.load_state_dict(torch.load('best.pth'))
-while True:
-    action = int(agent.act(state))
-    env_info = env.step(action)[brain_name]        # send the action to the environment
-    next_state = env_info.vector_observations[0]   # get the next state
-    reward = env_info.rewards[0]                   # get the reward
-    done = env_info.local_done[0]                  # see if episode has finished
-    score += reward                                # update the score
-    state = next_state                             # roll over the state to next time step
-    if done:                                       # exit loop if episode finished
-        break
-    
-print("Score: {}".format(score))
 
 # Close the environment.
 env.close()

@@ -69,6 +69,7 @@ ax = fig.add_subplot(111)
 plt.plot(np.arange(1, len(scores)+1), scores)
 plt.ylabel('Score')
 plt.xlabel('Episode #')
+fig.savefig("images/training.png")
 plt.show()
 
 # Close the environment.
