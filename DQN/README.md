@@ -17,3 +17,6 @@ There are 4 discrete actions for the entity (left, right, forward and backward) 
 # Improvements
 The design could be modified to use a convolutional network and accept the pixels as input rather than using the 37 state variables. 
 A replay buffer could be incorporated to reduce the temporal dependence. 
+
+# Additional Info
+https://www.nature.com/articles/nature14236

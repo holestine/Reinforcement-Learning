@@ -21,3 +21,6 @@ Could incorporate Truncated Natural Policy Gradient (TNPG) or Trust Region Polic
 
 # Credits
 This project is based on the code at https://github.com/udacity/deep-reinforcement-learning/tree/master/ddpg-bipedal 
+
+# Additional Info
+https://arxiv.org/pdf/1604.06778.pdf

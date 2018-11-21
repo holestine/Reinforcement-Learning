@@ -25,3 +25,6 @@ Action noise could be replaced with parameter noise (https://vimeo.com/252185862
 
 # Credits
 This project is based on the code at https://github.com/udacity/deep-reinforcement-learning/tree/master/ddpg-bipedal 
+
+# Additional Info
+https://arxiv.org/pdf/1706.02275.pdf
